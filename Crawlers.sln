@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArdesCrawler", "ArdesCrawler\ArdesCrawler.csproj", "{CA8AF95A-60A3-4549-94FE-7B3F96771EFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArdesCrawler", "ArdesCrawler\ArdesCrawler.csproj", "{CA8AF95A-60A3-4549-94FE-7B3F96771EFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewEggCrawler", "PcPartsPickerCrawler\NewEggCrawler.csproj", "{FDAF9B6A-A638-4964-8D8F-8DC2B85E5BEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CA8AF95A-60A3-4549-94FE-7B3F96771EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA8AF95A-60A3-4549-94FE-7B3F96771EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA8AF95A-60A3-4549-94FE-7B3F96771EFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDAF9B6A-A638-4964-8D8F-8DC2B85E5BEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDAF9B6A-A638-4964-8D8F-8DC2B85E5BEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDAF9B6A-A638-4964-8D8F-8DC2B85E5BEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDAF9B6A-A638-4964-8D8F-8DC2B85E5BEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

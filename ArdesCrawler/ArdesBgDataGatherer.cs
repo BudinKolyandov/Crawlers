@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using AngleSharp.Dom;
-using AngleSharp.Html.Parser;
-
-namespace ArdesCrawler
+﻿namespace ArdesCrawler
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using AngleSharp.Dom;
+    using AngleSharp.Html.Parser;
+
     public class ArdesBgDataGatherer
     {
         public async Task<IEnumerable<RawProduct>> GatherData(string name, int pages)
