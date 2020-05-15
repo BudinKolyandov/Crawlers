@@ -11,7 +11,11 @@ namespace PcPartsPickerCrawler
 
             foreach (var url in urls)
             {
-                Console.WriteLine(url);
+                Console.WriteLine(url.Name);
+                foreach (var spec in url.Specs)
+                {
+                    Console.WriteLine(spec.Key + ' ' + spec.Value);
+                }
             }
             Console.WriteLine(urls.Count());
         }

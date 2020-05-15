@@ -12,7 +12,7 @@
 
     public class NewEggCpuGatherer
     {
-        public async Task<IEnumerable<string>> GatherCpuData()
+        public async Task<IEnumerable<RawCpu>> GatherCpuData()
         {
             var cpus = new List<RawCpu>();
             var productUrls = new List<string>();
@@ -76,14 +76,50 @@
                 var response = await client.GetAsync(url);
                 var htmlContent = await response.Content.ReadAsStringAsync();
                 var document = await parser.ParseDocumentAsync(htmlContent);
-                var productName = document.GetElementById("Specs");
+                var productSpecs = document.GetElementById("detailSpecContent").InnerHtml;
+                var specs = productSpecs.Split("<dl>", StringSplitOptions.RemoveEmptyEntries);
+                var productName = string.Empty;
+                if (specs[0].Contains("<span>"))
+                {
+                    productName = specs[0].Substring(specs[0].IndexOf("<span>") + 6).Trim();
+                    productName = productName.Substring(0, productName.IndexOf("</span>")).Trim();
+                }
+                var cpu = new RawCpu
+                {
+                    Name = productName,
+                    Specs = new Dictionary<string, string>(),
+                };
+
+                foreach (var spec in specs)
+                {
+                    if (spec.Contains("<dt>") && spec.Contains("<dd>"))
+                    {
+                        var replaced = spec.Replace("<dt>", "|");
+                        replaced = replaced.Replace("</dt>", "|");
+                        replaced = replaced.Replace("<dd>", "|");
+                        replaced = replaced.Replace("</dd>", "|");
+                        var specsList = replaced.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                        var specName = specsList[0];
+                        var specValue = specsList[1];
+                        if (specName.Contains("a data"))
+                        {
+                            specName = specName.Substring(specName.IndexOf(">") + 1);
+                            specName = specName.Substring(0, specName.IndexOf("<"));
+                        }
+                        cpu.Specs.Add(specName, specValue);
+                    }
+                }
+                cpus.Add(cpu);
             }
             
-            return productUrls;
+            return cpus;
         }
     }
 
     public class RawCpu
     {
+        public string Name { get; set; }
+
+        public Dictionary<string, string> Specs { get; set; }
     }
 }
