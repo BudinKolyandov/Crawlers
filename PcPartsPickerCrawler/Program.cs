@@ -14,9 +14,7 @@ namespace PcPartsPickerCrawler
         static void Main(string[] args)
         {
             var cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
-
-            string path = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-            var directory = System.IO.Path.GetDirectoryName(path);
+            var memoryResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
 
             using (var spreadsheetDocument = SpreadsheetDocument.Create(@"E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls", SpreadsheetDocumentType.Workbook))
             {
@@ -30,15 +28,52 @@ namespace PcPartsPickerCrawler
                 DataTable procesorsTable = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(cpuResult), (typeof(DataTable)));
                 AddProcessorsToTable(procesorsTable, spreadsheetDocument, worksheetPart, sheetData, sheets);
 
+                DataTable memoriesTable = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(memoryResult), (typeof(DataTable)));
+                AddMemoriesToTable(memoriesTable, spreadsheetDocument, worksheetPart, sheetData, sheets);
+
                 workbookPart.Workbook.Save();
 
-                // Close the document.
                 spreadsheetDocument.Close();
 
                 Console.WriteLine($@"Excel file created , you can find the file E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls");
             }
 
             Console.WriteLine(cpuResult.Count());
+        }
+
+        private static void AddMemoriesToTable(DataTable memoriesTable, SpreadsheetDocument spreadsheetDocument, WorksheetPart worksheetPart, SheetData sheetData, Sheets sheets)
+        {
+            Sheet memoriesSheet = new Sheet()
+            {
+                Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart) + 1,
+                SheetId = 2,
+                Name = "Memories"
+            };
+            sheets.Append(memoriesSheet);
+
+            Row headerRow = new Row();
+            var columns = new List<string>();
+            foreach (DataColumn column in memoriesTable.Columns)
+            {
+                columns.Add(column.ColumnName);
+                Cell cell = new Cell();
+                cell.DataType = CellValues.String;
+                cell.CellValue = new CellValue(column.ColumnName);
+                headerRow.AppendChild(cell);
+            }
+            sheetData.AppendChild(headerRow);
+            foreach (DataRow dsrow in memoriesTable.Rows)
+            {
+                Row newRow = new Row();
+                foreach (var col in columns)
+                {
+                    Cell cell = new Cell();
+                    cell.DataType = CellValues.String;
+                    cell.CellValue = new CellValue(dsrow[col].ToString());
+                    newRow.AppendChild(cell);
+                }
+                sheetData.AppendChild(newRow);
+            }
         }
 
         private static void AddProcessorsToTable(DataTable procesorsTable, SpreadsheetDocument spreadsheetDocument, WorksheetPart worksheetPart, SheetData sheetData, Sheets sheets)

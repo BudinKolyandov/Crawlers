@@ -8,20 +8,20 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class NewEggCpuGatherer
+    public class NewEggMemoryGatherer
     {
-        public async Task<IEnumerable<RawCpu>> GatherCpuData()
+        public async Task<IEnumerable<RawMemory>> GatherMemoryData()
         {
-            var cpus = new List<RawCpu>();
+            var memories = new List<RawMemory>();
             var productUrls = new List<string>();
             var parser = new HtmlParser();
             var client = new HttpClient();
 
-            for (int page = 0; page <= 25; page++)
+            for (int page = 1; page <= 100; page++)
             {
                 Console.Write($"{page} => ");
 
-                var url = $"https://www.newegg.com/Processors-Desktops/SubCategory/ID-343/Page-{page}";
+                var url = $"https://www.newegg.com/Desktop-Memory/SubCategory/ID-147/Page-{page}";
                 string htmlContent = null;
                 for (var i = 0; i < 10; i++)
                 {
@@ -108,7 +108,7 @@
                     productName = productName.Substring(0, productName.IndexOf("</span>")).Trim();
                 }
 
-                var cpu = new RawCpu
+                var memory = new RawMemory
                 {
                     Name = productName,
                 };
@@ -124,7 +124,7 @@
 
                 if (imgHtml.Length > 0)
                 {
-                    cpu.ImgUrl = imgHtml;
+                    memory.ImgUrl = imgHtml;
                 }
 
                 foreach (var spec in specs)
@@ -146,31 +146,31 @@
                         switch (specName)
                         {
                             case "Brand":
-                                cpu.Brand = specValue;
+                                memory.Brand = specValue;
                                 break;
-                            case "Processors Type":
-                                cpu.ProcesorType = specValue;
+                            case "Capacity":
+                                memory.Capacity = specValue;
                                 break;
                             case "Series":
-                                cpu.Series = specValue;
+                                memory.Series = specValue;
                                 break;
                             case "Model":
-                                cpu.Model = specValue;
+                                memory.Model = specValue;
                                 break;
-                            case "CPU Socket Type":
-                                cpu.CPUSocketType = specValue;
+                            case "Type":
+                                memory.Type = specValue;
                                 break;
-                            case "# of Cores":
-                                cpu.NumberOfCores = specValue;
+                            case "Speed":
+                                memory.Speed = specValue;
                                 break;
-                            case "# of Threads":
-                                cpu.NumberOfThreads = specValue;
+                            case "CAS Latency":
+                                memory.CASLatency = specValue;
                                 break;
-                            case "Manufacturing Tech":
-                                cpu.ManufacturingTech = specValue;
+                            case "Timing":
+                                memory.Timing = specValue;
                                 break;
-                            case "Thermal Design Power":
-                                cpu.TDP = specValue;
+                            case "Heat Spreader":
+                                memory.HeatSpreader = specValue;
                                 break;
 
                             default:
@@ -178,13 +178,14 @@
                         }
                     }
                 }
-                cpus.Add(cpu);
+                memories.Add(memory);
             }
-            return cpus;
+
+            return memories;
         }
     }
 
-    public class RawCpu
+    public class RawMemory
     {
         public string Name { get; set; }
 
@@ -192,20 +193,20 @@
 
         public string Brand { get; set; }
 
-        public string ProcesorType { get; set; }
+        public string Capacity { get; set; }
 
         public string Series { get; set; }
 
         public string Model { get; set; }
 
-        public string CPUSocketType { get; set; }
+        public string Type { get; set; }
 
-        public string NumberOfCores { get; set; }
+        public string Speed { get; set; }
 
-        public string NumberOfThreads { get; set; }
+        public string CASLatency { get; set; }
 
-        public string ManufacturingTech { get; set; }
+        public string Timing { get; set; }
 
-        public string TDP { get; set; }
+        public string HeatSpreader { get; set; }
     }
 }
