@@ -19,7 +19,7 @@
             var parser = new HtmlParser();
             var client = new HttpClient();
 
-            for (int page = 1; page <= 2; page++)
+            for (int page = 1; page <= 25; page++)
             {
                 Console.Write($"{page} => ");
 
@@ -46,14 +46,14 @@
                 }
 
                 var document = await parser.ParseDocumentAsync(htmlContent);
-                
+
                 var elements = document.GetElementsByClassName("item-container      ");
-                
+
                 if (elements.Length == 0)
                 {
                     break;
                 }
-                
+
                 foreach (var element in elements)
                 {
                     string pcPartPickerUrl = null;
@@ -62,7 +62,6 @@
                     {
                         if (option.Contains("href=") && option.Contains("item-img"))
                         {
-                            // "product/9nm323/amd-ryzen-5-3600-36-thz-6-core-/processor-100-100000031box">\n"
                             var productUrlUntrimmed = option.Substring(option.IndexOf('/'));
                             var productUrl = productUrlUntrimmed.Substring(0, productUrlUntrimmed.Length - 19);
                             pcPartPickerUrl = "https:" + productUrl;
@@ -73,8 +72,21 @@
             }
             foreach (var url in productUrls)
             {
-                var response = await client.GetAsync(url);
-                var htmlContent = await response.Content.ReadAsStringAsync();
+                string htmlContent = null;
+                for (var i = 0; i < 10; i++)
+                {
+                    try
+                    {
+                        var response = await client.GetAsync(url);
+                        htmlContent = await response.Content.ReadAsStringAsync();
+                        break;
+                    }
+                    catch
+                    {
+                        Console.Write('!');
+                        Thread.Sleep(500);
+                    }
+                }
                 var document = await parser.ParseDocumentAsync(htmlContent);
                 var productSpecs = document.GetElementById("detailSpecContent").InnerHtml;
                 var specs = productSpecs.Split("<dl>", StringSplitOptions.RemoveEmptyEntries);
@@ -87,7 +99,6 @@
                 var cpu = new RawCpu
                 {
                     Name = productName,
-                    Specs = new Dictionary<string, string>(),
                 };
 
                 foreach (var spec in specs)
@@ -106,12 +117,44 @@
                             specName = specName.Substring(specName.IndexOf(">") + 1);
                             specName = specName.Substring(0, specName.IndexOf("<"));
                         }
-                        cpu.Specs.Add(specName, specValue);
+                        switch (specName)
+                        {
+                            case "Brand":
+                                cpu.Brand = specValue;
+                                break;
+                            case "Processors Type":
+                                cpu.ProcesorType = specValue;
+                                break;
+                            case "Series":
+                                cpu.Series = specValue;
+                                break;
+                            case "Model":
+                                cpu.Model = specValue;
+                                break;
+                            case "CPU Socket Type":
+                                cpu.CPUSocketType = specValue;
+                                break;
+                            case "# of Cores":
+                                cpu.NumberOfCores = specValue;
+                                break;
+                            case "# of Threads":
+                                cpu.NumberOfThreads = specValue;
+                                break;
+                            case "Manufacturing Tech":
+                                cpu.ManufacturingTech = specValue;
+                                break;
+                            case "Thermal Design Power":
+                                cpu.TDP = specValue;
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
                 }
                 cpus.Add(cpu);
             }
-            
+
             return cpus;
         }
     }
@@ -120,6 +163,22 @@
     {
         public string Name { get; set; }
 
-        public Dictionary<string, string> Specs { get; set; }
+        public string Brand { get; set; }
+
+        public string ProcesorType { get; set; }
+
+        public string Series { get; set; }
+
+        public string Model { get; set; }
+
+        public string CPUSocketType { get; set; }
+
+        public string NumberOfCores { get; set; }
+
+        public string NumberOfThreads { get; set; }
+
+        public string ManufacturingTech { get; set; }
+
+        public string TDP { get; set; }        
     }
 }

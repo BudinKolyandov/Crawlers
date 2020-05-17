@@ -21,13 +21,17 @@
             var powerSupliesResult = new ArdesBgDataGatherer().GatherData("zahranvane", 16).GetAwaiter().GetResult();
             var casesResult = new ArdesBgDataGatherer().GatherData("kompyutarni-kutii", 22).GetAwaiter().GetResult();
 
-            using (var spreadsheetDocument = SpreadsheetDocument.Create(@"C:\Users\Budin\Desktop\Crawlers\ArdesCrawler\ArdesCrawler\Data\ArdesData.xls", SpreadsheetDocumentType.Workbook))
+            string path = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            var directory = System.IO.Path.GetDirectoryName(path);
+
+            using (var spreadsheetDocument = SpreadsheetDocument.Create($@"{directory}\ArdesData.xls", SpreadsheetDocumentType.Workbook))
             {
                 WorkbookPart workbookPart;
                 WorksheetPart worksheetPart;
                 SheetData sheetData;
                 Sheets sheets;
-                CreateTable(spreadsheetDocument, out workbookPart, out worksheetPart, out sheetData, out sheets);
+                CreateTable(spreadsheetDocument, out workbookPart, out worksheetPart, out sheetData, out sheets);                
+                
                 DataTable hardDiscsTable = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(hardDisksResult), (typeof(DataTable)));
                 AddHardDrivesToTable(hardDiscsTable, spreadsheetDocument, worksheetPart, sheetData, sheets);
 
