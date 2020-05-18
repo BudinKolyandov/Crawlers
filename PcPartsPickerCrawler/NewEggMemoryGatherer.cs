@@ -1,7 +1,8 @@
-﻿namespace PcPartsPickerCrawler
+﻿namespace NewEggPartsCrawler
 {
     using AngleSharp.Dom;
     using AngleSharp.Html.Parser;
+    using NewEggCrawler.Data.Models;
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
@@ -10,9 +11,9 @@
 
     public class NewEggMemoryGatherer
     {
-        public async Task<IEnumerable<RawMemory>> GatherMemoryData()
+        public async Task<IEnumerable<Memory>> GatherMemoryData()
         {
-            var memories = new List<RawMemory>();
+            var memories = new List<Memory>();
             var productUrls = new List<string>();
             var parser = new HtmlParser();
             var client = new HttpClient();
@@ -108,7 +109,7 @@
                     productName = productName.Substring(0, productName.IndexOf("</span>")).Trim();
                 }
 
-                var memory = new RawMemory
+                var memory = new Memory
                 {
                     Name = productName,
                 };
@@ -183,30 +184,5 @@
 
             return memories;
         }
-    }
-
-    public class RawMemory
-    {
-        public string Name { get; set; }
-
-        public string ImgUrl { get; set; }
-
-        public string Brand { get; set; }
-
-        public string Capacity { get; set; }
-
-        public string Series { get; set; }
-
-        public string Model { get; set; }
-
-        public string Type { get; set; }
-
-        public string Speed { get; set; }
-
-        public string CASLatency { get; set; }
-
-        public string Timing { get; set; }
-
-        public string HeatSpreader { get; set; }
     }
 }

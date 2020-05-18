@@ -1,28 +1,81 @@
-﻿namespace NewEggPartsCrawler
-{
-    using AngleSharp.Dom;
-    using AngleSharp.Html.Parser;
-    using NewEggCrawler.Data.Models;
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿using AngleSharp.Html.Parser;
+using NewEggCrawler.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
-    public class NewEggCpuGatherer
+namespace NewEggCrawler
+{
+    public class NewEggMotherboardGatherer
     {
-        public async Task<IEnumerable<Cpu>> GatherCpuData()
+        public async Task<IEnumerable<Motherboard>> GatherMotherboardData()
         {
-            var cpus = new List<Cpu>();
+            var motherboards = new List<Motherboard>();
             var productUrls = new List<string>();
             var parser = new HtmlParser();
             var client = new HttpClient();
 
-            for (int page = 0; page <= 25; page++)
+            for (int page = 1; page <= 44; page++)
             {
                 Console.Write($"{page} => ");
 
-                var url = $"https://www.newegg.com/Processors-Desktops/SubCategory/ID-343/Page-{page}";
+                // AMD mobos
+                var url = $"https://www.newegg.com/Desktop-Memory/SubCategory/ID-22/Page-{page}";
+                string htmlContent = null;
+                for (var i = 0; i < 10; i++)
+                {
+                    try
+                    {
+                        var response = await client.GetAsync(url);
+                        htmlContent = await response.Content.ReadAsStringAsync();
+                        break;
+                    }
+                    catch
+                    {
+                        Console.Write('!');
+                        Thread.Sleep(500);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(htmlContent))
+                {
+                    break;
+                }
+
+                var document = await parser.ParseDocumentAsync(htmlContent);
+
+                var elements = document.GetElementsByClassName("item-container      ");
+
+                if (elements.Length == 0)
+                {
+                    break;
+                }
+
+                foreach (var element in elements)
+                {
+                    string pcPartPickerUrl = null;
+                    var options = element.InnerHtml.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var option in options)
+                    {
+                        if (option.Contains("href=") && option.Contains("item-img"))
+                        {
+                            var productUrlUntrimmed = option.Substring(option.IndexOf('/'));
+                            var productUrl = productUrlUntrimmed.Substring(0, productUrlUntrimmed.Length - 19);
+                            pcPartPickerUrl = "https:" + productUrl;
+                            productUrls.Add(pcPartPickerUrl);
+                        }
+                    }
+                }
+            }
+
+            for (int page = 1; page <= 100; page++)
+            {
+                Console.Write($"{page} => ");
+
+                // Intel mobos
+                var url = $"https://www.newegg.com/Desktop-Memory/SubCategory/ID-280/Page-{page}";
                 string htmlContent = null;
                 for (var i = 0; i < 10; i++)
                 {
@@ -109,7 +162,7 @@
                     productName = productName.Substring(0, productName.IndexOf("</span>")).Trim();
                 }
 
-                var cpu = new Cpu
+                var memory = new Motherboard
                 {
                     Name = productName,
                 };
@@ -125,7 +178,7 @@
 
                 if (imgHtml.Length > 0)
                 {
-                    cpu.ImgUrl = imgHtml;
+                    memory.ImgUrl = imgHtml;
                 }
 
                 foreach (var spec in specs)
@@ -147,31 +200,37 @@
                         switch (specName)
                         {
                             case "Brand":
-                                cpu.Brand = specValue;
-                                break;
-                            case "Processors Type":
-                                cpu.ProcesorType = specValue;
-                                break;
-                            case "Series":
-                                cpu.Series = specValue;
+                                memory.Brand = specValue;
                                 break;
                             case "Model":
-                                cpu.Model = specValue;
+                                memory.Model = specValue;
                                 break;
                             case "CPU Socket Type":
-                                cpu.CPUSocketType = specValue;
+                                memory.CPUSocketType = specValue;
                                 break;
-                            case "# of Cores":
-                                cpu.NumberOfCores = specValue;
+                            case "CPU Type":
+                                memory.CPUType = specValue;
                                 break;
-                            case "# of Threads":
-                                cpu.NumberOfThreads = specValue;
+                            case "Chipset":
+                                memory.Chipset = specValue;
                                 break;
-                            case "Manufacturing Tech":
-                                cpu.ManufacturingTech = specValue;
+                            case "Memory Standard":
+                                memory.MemoryStandard = specValue;
                                 break;
-                            case "Thermal Design Power":
-                                cpu.TDP = specValue;
+                            case "Number of Memory Slots":
+                                memory.NumberOfMemorySlots = specValue;
+                                break;
+                            case "Audio Chipset":
+                                memory.AudioChipset = specValue;
+                                break;
+                            case "LAN Chipset":
+                                memory.LANChipset = specValue;
+                                break;
+                            case "Max LAN Speed":
+                                memory.MaxLANSpeed = specValue;
+                                break;
+                            case "Form Factor":
+                                memory.FormFactor = specValue;
                                 break;
 
                             default:
@@ -179,9 +238,39 @@
                         }
                     }
                 }
-                cpus.Add(cpu);
+                motherboards.Add(memory);
             }
-            return cpus;
+
+            return motherboards;
+        }
+
+        public class RawMotherboard
+        {
+            public string Name { get; set; }
+
+            public string ImgUrl { get; set; }
+
+            public string Brand { get; set; }
+
+            public string Model { get; set; }
+
+            public string CPUSocketType { get; set; }
+
+            public string CPUType { get; set; }
+
+            public string Chipset { get; set; }
+
+            public string MemoryStandard { get; set; }
+
+            public string NumberOfMemorySlots { get; set; }
+
+            public string AudioChipset { get; set; }
+
+            public string LANChipset { get; set; }
+
+            public string MaxLANSpeed { get; set; }
+
+            public string FormFactor { get; set; }
         }
     }
 }

@@ -1,13 +1,16 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using NewEggCrawler;
+using NewEggCrawler.Data;
+using NewEggCrawler.Data.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace PcPartsPickerCrawler
+namespace NewEggPartsCrawler
 {
     class Program
     {
@@ -15,7 +18,30 @@ namespace PcPartsPickerCrawler
         {
             var cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
             var memoryResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
+            var motherboardResult = new NewEggMotherboardGatherer().GatherMotherboardData().GetAwaiter().GetResult();
+            var videoCardResult = new NewEggVideoCardGatherer().GatherVideoCardData().GetAwaiter().GetResult();
+            var caseResult = new NewEggCaseGatherer().GatherVideoCardData().GetAwaiter().GetResult();
+            var airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
+            var waterCoolerResult = new NewEggWaterCoolerGatherer().GatherWaterCoolerData().GetAwaiter().GetResult();
 
+            using (var context = new ApplicationDbContext())
+            {
+                context.Cpus.AddRange(cpuResult);
+                context.Memories.AddRange(memoryResult);
+                context.Motherboards.AddRange(motherboardResult);
+                context.VideoCards.AddRange(videoCardResult);
+                context.Cases.AddRange(caseResult);
+                context.AirCoolers.AddRange(airCoolerResult);
+                context.WaterCoolers.AddRange(waterCoolerResult);
+            }
+
+            // CreateAndFillExcelTable(cpuResult, memoryResult);
+
+            Console.WriteLine(cpuResult.Count());
+        }
+
+        private static void CreateAndFillExcelTable(IEnumerable<Cpu> cpuResult, IEnumerable<Memory> memoryResult)
+        {
             using (var spreadsheetDocument = SpreadsheetDocument.Create(@"E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls", SpreadsheetDocumentType.Workbook))
             {
                 WorkbookPart workbookPart;
@@ -37,8 +63,6 @@ namespace PcPartsPickerCrawler
 
                 Console.WriteLine($@"Excel file created , you can find the file E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls");
             }
-
-            Console.WriteLine(cpuResult.Count());
         }
 
         private static void AddMemoriesToTable(DataTable memoriesTable, SpreadsheetDocument spreadsheetDocument, WorksheetPart worksheetPart, SheetData sheetData, Sheets sheets)

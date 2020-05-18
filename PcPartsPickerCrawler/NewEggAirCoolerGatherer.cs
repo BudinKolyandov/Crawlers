@@ -1,28 +1,28 @@
-﻿namespace NewEggPartsCrawler
-{
-    using AngleSharp.Dom;
-    using AngleSharp.Html.Parser;
-    using NewEggCrawler.Data.Models;
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿using AngleSharp.Html.Parser;
+using NewEggCrawler.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
-    public class NewEggCpuGatherer
+namespace NewEggCrawler
+{
+    class NewEggAirCoolerGatherer
     {
-        public async Task<IEnumerable<Cpu>> GatherCpuData()
+        public async Task<IEnumerable<AirCooler>> GatherAirCoolerData()
         {
-            var cpus = new List<Cpu>();
+            var videoCards = new List<AirCooler>();
             var productUrls = new List<string>();
             var parser = new HtmlParser();
             var client = new HttpClient();
 
-            for (int page = 0; page <= 25; page++)
+            for (int page = 1; page <= 96; page++)
             {
                 Console.Write($"{page} => ");
 
-                var url = $"https://www.newegg.com/Processors-Desktops/SubCategory/ID-343/Page-{page}";
+                var url = $"https://www.newegg.com/Desktop-Memory/SubCategory/ID-574/Page-{page}";
                 string htmlContent = null;
                 for (var i = 0; i < 10; i++)
                 {
@@ -109,7 +109,7 @@
                     productName = productName.Substring(0, productName.IndexOf("</span>")).Trim();
                 }
 
-                var cpu = new Cpu
+                var videoCard = new AirCooler
                 {
                     Name = productName,
                 };
@@ -125,7 +125,7 @@
 
                 if (imgHtml.Length > 0)
                 {
-                    cpu.ImgUrl = imgHtml;
+                    videoCard.ImgUrl = imgHtml;
                 }
 
                 foreach (var spec in specs)
@@ -147,31 +147,28 @@
                         switch (specName)
                         {
                             case "Brand":
-                                cpu.Brand = specValue;
+                                videoCard.Brand = specValue;
                                 break;
-                            case "Processors Type":
-                                cpu.ProcesorType = specValue;
+                            case "Fan Size":
+                                videoCard.FanSize = specValue;
                                 break;
-                            case "Series":
-                                cpu.Series = specValue;
+                            case "CPU Socket Compatibility":
+                                videoCard.CPUSocketCompatibility = specValue;
                                 break;
-                            case "Model":
-                                cpu.Model = specValue;
+                            case "RPM":
+                                videoCard.RPM = specValue;
                                 break;
-                            case "CPU Socket Type":
-                                cpu.CPUSocketType = specValue;
+                            case "Power Connector":
+                                videoCard.PowerConnector = specValue;
                                 break;
-                            case "# of Cores":
-                                cpu.NumberOfCores = specValue;
+                            case "Max CPU Cooler Height":
+                                videoCard.MaxCPUCoolerHeight = specValue;
                                 break;
-                            case "# of Threads":
-                                cpu.NumberOfThreads = specValue;
+                            case "Heatsink Dimensions":
+                                videoCard.HeatsinkDimensions = specValue;
                                 break;
-                            case "Manufacturing Tech":
-                                cpu.ManufacturingTech = specValue;
-                                break;
-                            case "Thermal Design Power":
-                                cpu.TDP = specValue;
+                            case "Weight":
+                                videoCard.Weight = specValue;
                                 break;
 
                             default:
@@ -179,9 +176,10 @@
                         }
                     }
                 }
-                cpus.Add(cpu);
+                videoCards.Add(videoCard);
             }
-            return cpus;
+
+            return videoCards;
         }
     }
 }
