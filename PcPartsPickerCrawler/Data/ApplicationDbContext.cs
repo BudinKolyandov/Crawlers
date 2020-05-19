@@ -21,5 +21,11 @@ namespace NewEggCrawler.Data
         public DbSet<AirCooler> AirCoolers { get; set; }
 
         public DbSet<WaterCooler> WaterCoolers { get; set; }
+
+        public DbSet<PSU> PSUs { get; set; }
+
+        public DbSet<HardDiskDrive> HardDiskDrives { get; set; }
+
+        public DbSet<SolidStateDrive> SolidStateDrives { get; set; }
     }
 }

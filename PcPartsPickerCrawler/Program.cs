@@ -23,6 +23,9 @@ namespace NewEggPartsCrawler
             var caseResult = new NewEggCaseGatherer().GatherVideoCardData().GetAwaiter().GetResult();
             var airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
             var waterCoolerResult = new NewEggWaterCoolerGatherer().GatherWaterCoolerData().GetAwaiter().GetResult();
+            var powerSuppliesResult = new NewEggPowerSupplyGatherer().GatherPowerSuppliesData().GetAwaiter().GetResult();
+            var hardDrivesResult = new NewEggHardDrivesGatherer().GatherHardDrivesData().GetAwaiter().GetResult();
+            var solidStateDrivesResult = new NewEggSolidStateDrivesGatherer().GatherSolidStateDrivesData().GetAwaiter().GetResult();
 
             using (var context = new ApplicationDbContext())
             {
@@ -33,6 +36,10 @@ namespace NewEggPartsCrawler
                 context.Cases.AddRange(caseResult);
                 context.AirCoolers.AddRange(airCoolerResult);
                 context.WaterCoolers.AddRange(waterCoolerResult);
+                context.PSUs.AddRange(powerSuppliesResult);
+                context.HardDiskDrives.AddRange(hardDrivesResult);
+                context.SolidStateDrives.AddRange(solidStateDrivesResult);
+                context.SaveChanges();
             }
 
             // CreateAndFillExcelTable(cpuResult, memoryResult);
