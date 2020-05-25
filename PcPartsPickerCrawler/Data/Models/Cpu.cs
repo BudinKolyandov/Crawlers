@@ -8,6 +8,8 @@
 
         public string ImgUrl { get; set; }
 
+        public byte[] Image { get; set; }
+
         public string Brand { get; set; }
 
         public string ProcesorType { get; set; }

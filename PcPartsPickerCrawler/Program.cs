@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml;
+﻿using AngleSharp.Html.Parser;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using NewEggCrawler;
@@ -8,7 +9,14 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NewEggPartsCrawler
 {
@@ -16,17 +24,65 @@ namespace NewEggPartsCrawler
     {
         static void Main(string[] args)
         {
-            var cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
-            var memoryResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
-            var motherboardResult = new NewEggMotherboardGatherer().GatherMotherboardData().GetAwaiter().GetResult();
-            var videoCardResult = new NewEggVideoCardGatherer().GatherVideoCardData().GetAwaiter().GetResult();
-            var caseResult = new NewEggCaseGatherer().GatherVideoCardData().GetAwaiter().GetResult();
-            var airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
-            var waterCoolerResult = new NewEggWaterCoolerGatherer().GatherWaterCoolerData().GetAwaiter().GetResult();
-            var powerSuppliesResult = new NewEggPowerSupplyGatherer().GatherPowerSuppliesData().GetAwaiter().GetResult();
-            var hardDrivesResult = new NewEggHardDrivesGatherer().GatherHardDrivesData().GetAwaiter().GetResult();
-            var solidStateDrivesResult = new NewEggSolidStateDrivesGatherer().GatherSolidStateDrivesData().GetAwaiter().GetResult();
+            // IEnumerable<Cpu> cpuResult;
+            // IEnumerable<Memory> memoryResult;
+            // IEnumerable<Motherboard> motherboardResult;
+            // IEnumerable<VideoCard> videoCardResult;
+            // IEnumerable<Case> caseResult;
+            // IEnumerable<AirCooler> airCoolerResult;
+            // IEnumerable<WaterCooler> waterCoolerResult;
+            // IEnumerable<PSU> powerSuppliesResult;
+            // IEnumerable<HardDiskDrive> hardDrivesResult;
+            // IEnumerable<SolidStateDrive> solidStateDrivesResult;
 
+            // GatherData(out cpuResult, out memoryResult, out motherboardResult, out videoCardResult, out caseResult, out airCoolerResult, out waterCoolerResult, out powerSuppliesResult, out hardDrivesResult, out solidStateDrivesResult);
+
+            // SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
+
+            using (var context = new ApplicationDbContext())
+            {
+                var cpus = context.Cpus.Where(x => x.Name != " ").ToList();
+                Console.WriteLine(cpus.Count);
+
+                var imgArray = TransformImage(cpus[0].ImgUrl).GetAwaiter().GetResult();
+
+                //foreach (var cpu in cpus)
+                //{
+                //    var imgArray = TransformImage(cpu.ImgUrl);
+                //}
+            }
+
+            // CreateAndFillExcelTable(cpuResult, memoryResult);
+
+            // Console.WriteLine(cpuResult.Count());
+        }
+
+        private static async Task<byte[]> TransformImage(string imgUrl)
+        {
+            var img = new byte[5000];
+
+            var fullUrl = @"https://" + imgUrl;
+            var localPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(fullUrl))
+                {
+                    using (var source = await response.Content.ReadAsStreamAsync())
+                    {
+                        using (var target = File.OpenWrite(localPath))
+                        {
+                            await source.CopyToAsync(target);
+                        }
+                    }
+                }
+            }
+
+            return img;
+        }
+
+        private static void SaveData(IEnumerable<Cpu> cpuResult, IEnumerable<Memory> memoryResult, IEnumerable<Motherboard> motherboardResult, IEnumerable<VideoCard> videoCardResult, IEnumerable<Case> caseResult, IEnumerable<AirCooler> airCoolerResult, IEnumerable<WaterCooler> waterCoolerResult, IEnumerable<PSU> powerSuppliesResult, IEnumerable<HardDiskDrive> hardDrivesResult, IEnumerable<SolidStateDrive> solidStateDrivesResult)
+        {
             using (var context = new ApplicationDbContext())
             {
                 context.Cpus.AddRange(cpuResult);
@@ -41,10 +97,20 @@ namespace NewEggPartsCrawler
                 context.SolidStateDrives.AddRange(solidStateDrivesResult);
                 context.SaveChanges();
             }
+        }
 
-            // CreateAndFillExcelTable(cpuResult, memoryResult);
-
-            Console.WriteLine(cpuResult.Count());
+        private static void GatherData(out IEnumerable<Cpu> cpuResult, out IEnumerable<Memory> memoryResult, out IEnumerable<Motherboard> motherboardResult, out IEnumerable<VideoCard> videoCardResult, out IEnumerable<Case> caseResult, out IEnumerable<AirCooler> airCoolerResult, out IEnumerable<WaterCooler> waterCoolerResult, out IEnumerable<PSU> powerSuppliesResult, out IEnumerable<HardDiskDrive> hardDrivesResult, out IEnumerable<SolidStateDrive> solidStateDrivesResult)
+        {
+            cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
+            memoryResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
+            motherboardResult = new NewEggMotherboardGatherer().GatherMotherboardData().GetAwaiter().GetResult();
+            videoCardResult = new NewEggVideoCardGatherer().GatherVideoCardData().GetAwaiter().GetResult();
+            caseResult = new NewEggCaseGatherer().GatherVideoCardData().GetAwaiter().GetResult();
+            airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
+            waterCoolerResult = new NewEggWaterCoolerGatherer().GatherWaterCoolerData().GetAwaiter().GetResult();
+            powerSuppliesResult = new NewEggPowerSupplyGatherer().GatherPowerSuppliesData().GetAwaiter().GetResult();
+            hardDrivesResult = new NewEggHardDrivesGatherer().GatherHardDrivesData().GetAwaiter().GetResult();
+            solidStateDrivesResult = new NewEggSolidStateDrivesGatherer().GatherSolidStateDrivesData().GetAwaiter().GetResult();
         }
 
         private static void CreateAndFillExcelTable(IEnumerable<Cpu> cpuResult, IEnumerable<Memory> memoryResult)
