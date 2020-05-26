@@ -29,17 +29,20 @@ namespace NewEggPartsCrawler
             // IEnumerable<Motherboard> motherboardResult;
             // IEnumerable<VideoCard> videoCardResult;
             // IEnumerable<Case> caseResult;
-            // IEnumerable<AirCooler> airCoolerResult;
+            IEnumerable<AirCooler> airCoolerResult;
             // IEnumerable<WaterCooler> waterCoolerResult;
             // IEnumerable<PSU> powerSuppliesResult;
             // IEnumerable<HardDiskDrive> hardDrivesResult;
             // IEnumerable<SolidStateDrive> solidStateDrivesResult;
 
             cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
+            airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
 
             using (var context = new ApplicationDbContext())
             {
                 context.Cpus.AddRange(cpuResult);
+                context.AirCoolers.AddRange(airCoolerResult);
+                context.SaveChanges();
             }
 
             // GatherData(out cpuResult, out memoryResult, out motherboardResult, out videoCardResult, out caseResult, out airCoolerResult, out waterCoolerResult, out powerSuppliesResult, out hardDrivesResult, out solidStateDrivesResult);
@@ -48,18 +51,35 @@ namespace NewEggPartsCrawler
 
             using (var context = new ApplicationDbContext())
             {
-                var cpus = context.Cpus.Where(x => x.Name != " ").ToList();
+                var cpus = context.Cpus
+                    .Where(x => x.Name != " ").ToList();
                 context.Cpus.RemoveRange(context.Cpus);
                 context.SaveChanges();
+                var cpusToAdd = new List<Cpu>();
                 Console.WriteLine(cpus.Count);                
 
                 foreach (var cpu in cpus)
                 {
                     Console.WriteLine(cpu.Id);
                     var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    var cpuToAdd = new Cpu
+                    {
+                        Brand = cpu.Brand,
+                        CPUSocketType = cpu.CPUSocketType,
+                        Image = imgArray,
+                        ImgUrl = cpu.ImgUrl,
+                        ManufacturingTech = cpu.ManufacturingTech,
+                        Model = cpu.Model,
+                        Name = cpu.Name,
+                        NumberOfCores = cpu.NumberOfCores,
+                        NumberOfThreads = cpu.NumberOfThreads,
+                        ProcesorType = cpu.ProcesorType,
+                        TDP = cpu.TDP,
+                        Series = cpu.Series,
+                    };
+                    cpusToAdd.Add(cpuToAdd);
                 }
-                context.Cpus.AddRange(cpus);
+                context.Cpus.AddRange(cpusToAdd);
                 context.SaveChanges();
             }
 
@@ -68,15 +88,30 @@ namespace NewEggPartsCrawler
                 var airCoolers = context.AirCoolers.Where(x => x.Name != " ").ToList();
                 context.AirCoolers.RemoveRange(context.AirCoolers);
                 context.SaveChanges();
+                var airCoolersToAdd = new List<AirCooler>();
                 Console.WriteLine(airCoolers.Count);
 
-                foreach (var cpu in airCoolers)
+                foreach (var airCooler in airCoolers)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(airCooler.Id);
+                    var imgArray = TransformImage(airCooler.ImgUrl).GetAwaiter().GetResult();
+                    var airCoolerToAdd = new AirCooler
+                    {
+                        Brand = airCooler.Brand,
+                        FanSize = airCooler.FanSize,
+                        CPUSocketCompatibility = airCooler.CPUSocketCompatibility,
+                        HeatsinkDimensions = airCooler.HeatsinkDimensions,
+                        Image = imgArray,
+                        ImgUrl = airCooler.ImgUrl,
+                        MaxCPUCoolerHeight = airCooler.MaxCPUCoolerHeight,
+                        Name = airCooler.Name,
+                        PowerConnector = airCooler.PowerConnector,
+                        RPM = airCooler.RPM,
+                        Weight = airCooler.Weight,
+                    };
+                    airCoolersToAdd.Add(airCoolerToAdd);
                 }
-                context.AirCoolers.AddRange(airCoolers);
+                context.AirCoolers.AddRange(airCoolersToAdd);
                 context.SaveChanges();
             }
 
@@ -85,15 +120,32 @@ namespace NewEggPartsCrawler
                 var cases = context.Cases.Where(x => x.Name != " ").ToList();
                 context.Cases.RemoveRange(context.Cases);
                 context.SaveChanges();
+                var casesToAdd = new List<Case>();
                 Console.WriteLine(cases.Count);
 
-                foreach (var cpu in cases)
+                foreach (var @case in cases)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(@case.Id);
+                    var imgArray = TransformImage(@case.ImgUrl).GetAwaiter().GetResult();
+                    var caseToAdd = new Case
+                    {
+                        Brand = @case.Brand,
+                        MaxCPUCoolerHeightAllowance = @case.MaxCPUCoolerHeightAllowance,
+                        MaxGPULengthAllowance = @case.MaxGPULengthAllowance,
+                        CaseMaterial = @case.CaseMaterial,
+                        Color = @case.Color,
+                        ExpansionSlots = @case.ExpansionSlots,
+                        Image = imgArray,
+                        ImgUrl = @case.ImgUrl,
+                        MotherboardCompatibility = @case.MotherboardCompatibility,
+                        Name = @case.Name,
+                        SidePanelWindow = @case.SidePanelWindow,
+                        Type = @case.Type,
+                    };
+                    casesToAdd.Add(caseToAdd);
+                    @case.Image = imgArray;
                 }
-                context.Cases.AddRange(cases);
+                context.Cases.AddRange(casesToAdd);
                 context.SaveChanges();
             }
 
@@ -102,15 +154,30 @@ namespace NewEggPartsCrawler
                 var hdds = context.HardDiskDrives.Where(x => x.Name != " ").ToList();
                 context.HardDiskDrives.RemoveRange(context.HardDiskDrives);
                 context.SaveChanges();
+                var hardDisksToAdd = new List<HardDiskDrive>();
                 Console.WriteLine(hdds.Count);
 
-                foreach (var cpu in hdds)
+                foreach (var hdd in hdds)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(hdd.Id);
+                    var imgArray = TransformImage(hdd.ImgUrl).GetAwaiter().GetResult();
+                    var hardToAdd = new HardDiskDrive
+                    {
+                        Brand = hdd.Brand,
+                        Cache = hdd.Cache,
+                        Capacity = hdd.Capacity,
+                        FormFactor = hdd.FormFactor,
+                        Image = imgArray,
+                        ImgUrl = hdd.ImgUrl,
+                        Interface = hdd.Interface,
+                        Name = hdd.Name,
+                        RPM = hdd.RPM,
+                        Usage = hdd.Usage,
+                    };
+                    hardDisksToAdd.Add(hardToAdd);
+                    hdd.Image = imgArray;
                 }
-                context.HardDiskDrives.AddRange(hdds);
+                context.HardDiskDrives.AddRange(hardDisksToAdd);
                 context.SaveChanges();
             }
 
@@ -119,15 +186,32 @@ namespace NewEggPartsCrawler
                 var memories = context.Memories.Where(x => x.Name != " ").ToList();
                 context.Memories.RemoveRange(context.Memories);
                 context.SaveChanges();
+                var memoriesToAdd = new List<Memory>();
                 Console.WriteLine(memories.Count);
 
-                foreach (var cpu in memories)
+                foreach (var memory in memories)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(memory.Id);
+                    var imgArray = TransformImage(memory.ImgUrl).GetAwaiter().GetResult();
+                    var memoryToAdd = new Memory
+                    {
+                        Brand = memory.Brand,
+                        CASLatency = memory.CASLatency,
+                        Capacity = memory.Capacity,
+                        HeatSpreader = memory.HeatSpreader,
+                        Image = imgArray,
+                        ImgUrl = memory.ImgUrl,
+                        Model = memory.Model,
+                        Name = memory.Name,
+                        Series = memory.Series,
+                        Speed = memory.Speed,
+                        Timing = memory.Timing,
+                        Type = memory.Type,
+                    };
+                    memoriesToAdd.Add(memoryToAdd);
+                    memory.Image = imgArray;
                 }
-                context.Memories.AddRange(memories);
+                context.Memories.AddRange(memoriesToAdd);
                 context.SaveChanges();
             }
 
@@ -136,15 +220,34 @@ namespace NewEggPartsCrawler
                 var motherboards = context.Motherboards.Where(x => x.Name != " ").ToList();
                 context.Motherboards.RemoveRange(context.Motherboards);
                 context.SaveChanges();
+                var motherboardsToAdd = new List<Motherboard>();
                 Console.WriteLine(motherboards.Count);
 
-                foreach (var cpu in motherboards)
+                foreach (var motherboard in motherboards)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(motherboard.Id);
+                    var imgArray = TransformImage(motherboard.ImgUrl).GetAwaiter().GetResult();
+                    var motherboardToAdd = new Motherboard
+                    {
+                        Brand = motherboard.Brand,
+                        AudioChipset = motherboard.AudioChipset,
+                        LANChipset = motherboard.LANChipset,
+                        Chipset = motherboard.Chipset,
+                        CPUSocketType = motherboard.CPUSocketType,
+                        CPUType = motherboard.CPUType,
+                        FormFactor = motherboard.FormFactor,
+                        Image = imgArray,
+                        ImgUrl = motherboard.ImgUrl,
+                        MaxLANSpeed = motherboard.MaxLANSpeed,
+                        MemoryStandard = motherboard.MemoryStandard,
+                        Model = motherboard.Model,
+                        Name = motherboard.Name,
+                        NumberOfMemorySlots = motherboard.NumberOfMemorySlots,
+                    };
+                    motherboardsToAdd.Add(motherboardToAdd);
+                    motherboard.Image = imgArray;
                 }
-                context.Motherboards.AddRange(motherboards);
+                context.Motherboards.AddRange(motherboardsToAdd);
                 context.SaveChanges();
             }
 
@@ -153,15 +256,29 @@ namespace NewEggPartsCrawler
                 var psus = context.PSUs.Where(x => x.Name != " ").ToList();
                 context.PSUs.RemoveRange(context.PSUs);
                 context.SaveChanges();
+                var psusToAdd = new List<PSU>();
                 Console.WriteLine(psus.Count);
 
-                foreach (var cpu in psus)
+                foreach (var psu in psus)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(psu.Id);
+                    var imgArray = TransformImage(psu.ImgUrl).GetAwaiter().GetResult();
+                    var psuToAdd = new PSU
+                    {
+                        Brand = psu.Brand,
+                        EnergyEfficiency = psu.EnergyEfficiency,
+                        Fans = psu.Fans,
+                        Image = imgArray,
+                        ImgUrl = psu.ImgUrl,
+                        MaximumPower = psu.MaximumPower,
+                        Modular = psu.Modular,
+                        Name = psu.Name,
+                        Type = psu.Type,
+                    };
+                    psusToAdd.Add(psuToAdd);
+                    psu.Image = imgArray;
                 }
-                context.PSUs.AddRange(psus);
+                context.PSUs.AddRange(psusToAdd);
                 context.SaveChanges();
             }
 
@@ -170,15 +287,30 @@ namespace NewEggPartsCrawler
                 var ssds = context.SolidStateDrives.Where(x => x.Name != " ").ToList();
                 context.SolidStateDrives.RemoveRange(context.SolidStateDrives);
                 context.SaveChanges();
+                var ssdsToAdd = new List<SolidStateDrive>();
                 Console.WriteLine(ssds.Count);
 
-                foreach (var cpu in ssds)
+                foreach (var ssd in ssds)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(ssd.Id);
+                    var imgArray = TransformImage(ssd.ImgUrl).GetAwaiter().GetResult();
+                    var ssdToAdd = new SolidStateDrive
+                    {
+                        Brand = ssd.Brand,
+                        Capacity = ssd.Capacity,
+                        FormFactor = ssd.FormFactor,
+                        DeviceType = ssd.DeviceType,
+                        Image = imgArray,
+                        ImgUrl = ssd.ImgUrl,
+                        Interface = ssd.Interface,
+                        MemoryComponents = ssd.MemoryComponents,
+                        Name = ssd.Name,
+                        UsedFor = ssd.UsedFor,
+                    };
+                    ssdsToAdd.Add(ssdToAdd);
+                    ssd.Image = imgArray;
                 }
-                context.SolidStateDrives.AddRange(ssds);
+                context.SolidStateDrives.AddRange(ssdsToAdd);
                 context.SaveChanges();
             }
 
@@ -187,15 +319,35 @@ namespace NewEggPartsCrawler
                 var videoCards = context.VideoCards.Where(x => x.Name != " ").ToList();
                 context.VideoCards.RemoveRange(context.VideoCards);
                 context.SaveChanges();
+                var videoCardsToAdd = new List<VideoCard>();
                 Console.WriteLine(videoCards.Count);
 
-                foreach (var cpu in videoCards)
+                foreach (var videoCard in videoCards)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(videoCard.Id);
+                    var imgArray = TransformImage(videoCard.ImgUrl).GetAwaiter().GetResult();
+                    var videoCordToAdd = new VideoCard
+                    {
+                        Brand = videoCard.Brand,
+                        Cooler = videoCard.Cooler,
+                        DirectX = videoCard.DirectX,
+                        FormFactor = videoCard.FormFactor,
+                        GPU = videoCard.GPU,
+                        Image = imgArray,
+                        ImgUrl = videoCard.ImgUrl,
+                        Interface = videoCard.Interface,
+                        MaxGPULength = videoCard.MaxGPULength,
+                        Model = videoCard.Model,
+                        Name = videoCard.Name,
+                        OpenGL = videoCard.OpenGL,
+                        SlotWidth = videoCard.SlotWidth,
+                        StreamProcessors = videoCard.StreamProcessors,
+                        SystemRequirements = videoCard.SystemRequirements,
+                    };
+                    videoCardsToAdd.Add(videoCordToAdd);
+                    videoCard.Image = imgArray;
                 }
-                context.VideoCards.AddRange(videoCards);
+                context.VideoCards.AddRange(videoCardsToAdd);
                 context.SaveChanges();
             }
 
@@ -204,15 +356,32 @@ namespace NewEggPartsCrawler
                 var waterCoolers = context.WaterCoolers.Where(x => x.Name != " ").ToList();
                 context.WaterCoolers.RemoveRange(context.WaterCoolers);
                 context.SaveChanges();
+                var waterCoolersToAdd = new List<WaterCooler>();
                 Console.WriteLine(waterCoolers.Count);
 
-                foreach (var cpu in waterCoolers)
+                foreach (var waterCooler in waterCoolers)
                 {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    cpu.Image = imgArray;
+                    Console.WriteLine(waterCooler.Id);
+                    var imgArray = TransformImage(waterCooler.ImgUrl).GetAwaiter().GetResult();
+                    var waterCoolerToAdd = new WaterCooler
+                    {
+                        Brand = waterCooler.Brand,
+                        FanAirFlow = waterCooler.FanAirFlow,
+                        BlockCompatibility = waterCooler.BlockCompatibility,
+                        FanRPM = waterCooler.FanRPM,
+                        FanSize = waterCooler.FanSize,
+                        Image = imgArray,
+                        ImgUrl = waterCooler.ImgUrl,
+                        Name = waterCooler.Name,
+                        PumpCapacity = waterCooler.PumpCapacity,
+                        RadiatorDim = waterCooler.RadiatorDim,
+                        TubeDim = waterCooler.TubeDim,
+                        Type = waterCooler.Type,
+                    };
+                    waterCoolersToAdd.Add(waterCoolerToAdd);
+                    waterCooler.Image = imgArray;
                 }
-                context.WaterCoolers.AddRange(waterCoolers);
+                context.WaterCoolers.AddRange(waterCoolersToAdd);
                 context.SaveChanges();
             }
 
