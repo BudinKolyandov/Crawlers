@@ -24,24 +24,22 @@ namespace NewEggPartsCrawler
     {
         static void Main(string[] args)
         {
-            IEnumerable<Cpu> cpuResult;
+            // IEnumerable<Cpu> cpuResult;
             // IEnumerable<Memory> memoryResult;
             // IEnumerable<Motherboard> motherboardResult;
             // IEnumerable<VideoCard> videoCardResult;
             // IEnumerable<Case> caseResult;
-            IEnumerable<AirCooler> airCoolerResult;
+            // IEnumerable<AirCooler> airCoolerResult;
             // IEnumerable<WaterCooler> waterCoolerResult;
             // IEnumerable<PSU> powerSuppliesResult;
             // IEnumerable<HardDiskDrive> hardDrivesResult;
             // IEnumerable<SolidStateDrive> solidStateDrivesResult;
 
-            cpuResult = new NewEggCpuGatherer().GatherCpuData().GetAwaiter().GetResult();
-            airCoolerResult = new NewEggAirCoolerGatherer().GatherAirCoolerData().GetAwaiter().GetResult();
+            var memoryesResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
 
             using (var context = new ApplicationDbContext())
             {
-                context.Cpus.AddRange(cpuResult);
-                context.AirCoolers.AddRange(airCoolerResult);
+                context.Memories.AddRange(memoryesResult);
                 context.SaveChanges();
             }
 
@@ -49,137 +47,7 @@ namespace NewEggPartsCrawler
 
             // SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
 
-            using (var context = new ApplicationDbContext())
-            {
-                var cpus = context.Cpus
-                    .Where(x => x.Name != " ").ToList();
-                context.Cpus.RemoveRange(context.Cpus);
-                context.SaveChanges();
-                var cpusToAdd = new List<Cpu>();
-                Console.WriteLine(cpus.Count);                
-
-                foreach (var cpu in cpus)
-                {
-                    Console.WriteLine(cpu.Id);
-                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
-                    var cpuToAdd = new Cpu
-                    {
-                        Brand = cpu.Brand,
-                        CPUSocketType = cpu.CPUSocketType,
-                        Image = imgArray,
-                        ImgUrl = cpu.ImgUrl,
-                        ManufacturingTech = cpu.ManufacturingTech,
-                        Model = cpu.Model,
-                        Name = cpu.Name,
-                        NumberOfCores = cpu.NumberOfCores,
-                        NumberOfThreads = cpu.NumberOfThreads,
-                        ProcesorType = cpu.ProcesorType,
-                        TDP = cpu.TDP,
-                        Series = cpu.Series,
-                    };
-                    cpusToAdd.Add(cpuToAdd);
-                }
-                context.Cpus.AddRange(cpusToAdd);
-                context.SaveChanges();
-            }
-
-            using (var context = new ApplicationDbContext())
-            {
-                var airCoolers = context.AirCoolers.Where(x => x.Name != " ").ToList();
-                context.AirCoolers.RemoveRange(context.AirCoolers);
-                context.SaveChanges();
-                var airCoolersToAdd = new List<AirCooler>();
-                Console.WriteLine(airCoolers.Count);
-
-                foreach (var airCooler in airCoolers)
-                {
-                    Console.WriteLine(airCooler.Id);
-                    var imgArray = TransformImage(airCooler.ImgUrl).GetAwaiter().GetResult();
-                    var airCoolerToAdd = new AirCooler
-                    {
-                        Brand = airCooler.Brand,
-                        FanSize = airCooler.FanSize,
-                        CPUSocketCompatibility = airCooler.CPUSocketCompatibility,
-                        HeatsinkDimensions = airCooler.HeatsinkDimensions,
-                        Image = imgArray,
-                        ImgUrl = airCooler.ImgUrl,
-                        MaxCPUCoolerHeight = airCooler.MaxCPUCoolerHeight,
-                        Name = airCooler.Name,
-                        PowerConnector = airCooler.PowerConnector,
-                        RPM = airCooler.RPM,
-                        Weight = airCooler.Weight,
-                    };
-                    airCoolersToAdd.Add(airCoolerToAdd);
-                }
-                context.AirCoolers.AddRange(airCoolersToAdd);
-                context.SaveChanges();
-            }
-
-            using (var context = new ApplicationDbContext())
-            {
-                var cases = context.Cases.Where(x => x.Name != " ").ToList();
-                context.Cases.RemoveRange(context.Cases);
-                context.SaveChanges();
-                var casesToAdd = new List<Case>();
-                Console.WriteLine(cases.Count);
-
-                foreach (var @case in cases)
-                {
-                    Console.WriteLine(@case.Id);
-                    var imgArray = TransformImage(@case.ImgUrl).GetAwaiter().GetResult();
-                    var caseToAdd = new Case
-                    {
-                        Brand = @case.Brand,
-                        MaxCPUCoolerHeightAllowance = @case.MaxCPUCoolerHeightAllowance,
-                        MaxGPULengthAllowance = @case.MaxGPULengthAllowance,
-                        CaseMaterial = @case.CaseMaterial,
-                        Color = @case.Color,
-                        ExpansionSlots = @case.ExpansionSlots,
-                        Image = imgArray,
-                        ImgUrl = @case.ImgUrl,
-                        MotherboardCompatibility = @case.MotherboardCompatibility,
-                        Name = @case.Name,
-                        SidePanelWindow = @case.SidePanelWindow,
-                        Type = @case.Type,
-                    };
-                    casesToAdd.Add(caseToAdd);
-                    @case.Image = imgArray;
-                }
-                context.Cases.AddRange(casesToAdd);
-                context.SaveChanges();
-            }
-
-            using (var context = new ApplicationDbContext())
-            {
-                var hdds = context.HardDiskDrives.Where(x => x.Name != " ").ToList();
-                context.HardDiskDrives.RemoveRange(context.HardDiskDrives);
-                context.SaveChanges();
-                var hardDisksToAdd = new List<HardDiskDrive>();
-                Console.WriteLine(hdds.Count);
-
-                foreach (var hdd in hdds)
-                {
-                    Console.WriteLine(hdd.Id);
-                    var imgArray = TransformImage(hdd.ImgUrl).GetAwaiter().GetResult();
-                    var hardToAdd = new HardDiskDrive
-                    {
-                        Brand = hdd.Brand,
-                        Cache = hdd.Cache,
-                        Capacity = hdd.Capacity,
-                        FormFactor = hdd.FormFactor,
-                        Image = imgArray,
-                        ImgUrl = hdd.ImgUrl,
-                        Interface = hdd.Interface,
-                        Name = hdd.Name,
-                        RPM = hdd.RPM,
-                        Usage = hdd.Usage,
-                    };
-                    hardDisksToAdd.Add(hardToAdd);
-                    hdd.Image = imgArray;
-                }
-                context.HardDiskDrives.AddRange(hardDisksToAdd);
-                context.SaveChanges();
-            }
+            // AddImagesToThePartsCpuToHdd();
 
             using (var context = new ApplicationDbContext())
             {
@@ -388,6 +256,141 @@ namespace NewEggPartsCrawler
             // CreateAndFillExcelTable(cpuResult, memoryResult);
 
             // Console.WriteLine(cpuResult.Count());
+        }
+
+        private static void AddImagesToThePartsCpuToHdd()
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var cpus = context.Cpus
+                    .Where(x => x.Name != " ").ToList();
+                context.Cpus.RemoveRange(context.Cpus);
+                context.SaveChanges();
+                var cpusToAdd = new List<Cpu>();
+                Console.WriteLine(cpus.Count);
+
+                foreach (var cpu in cpus)
+                {
+                    Console.WriteLine(cpu.Id);
+                    var imgArray = TransformImage(cpu.ImgUrl).GetAwaiter().GetResult();
+                    var cpuToAdd = new Cpu
+                    {
+                        Brand = cpu.Brand,
+                        CPUSocketType = cpu.CPUSocketType,
+                        Image = imgArray,
+                        ImgUrl = cpu.ImgUrl,
+                        ManufacturingTech = cpu.ManufacturingTech,
+                        Model = cpu.Model,
+                        Name = cpu.Name,
+                        NumberOfCores = cpu.NumberOfCores,
+                        NumberOfThreads = cpu.NumberOfThreads,
+                        ProcesorType = cpu.ProcesorType,
+                        TDP = cpu.TDP,
+                        Series = cpu.Series,
+                    };
+                    cpusToAdd.Add(cpuToAdd);
+                }
+                context.Cpus.AddRange(cpusToAdd);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApplicationDbContext())
+            {
+                var airCoolers = context.AirCoolers.Where(x => x.Name != " ").ToList();
+                context.AirCoolers.RemoveRange(context.AirCoolers);
+                context.SaveChanges();
+                var airCoolersToAdd = new List<AirCooler>();
+                Console.WriteLine(airCoolers.Count);
+
+                foreach (var airCooler in airCoolers)
+                {
+                    Console.WriteLine(airCooler.Id);
+                    var imgArray = TransformImage(airCooler.ImgUrl).GetAwaiter().GetResult();
+                    var airCoolerToAdd = new AirCooler
+                    {
+                        Brand = airCooler.Brand,
+                        FanSize = airCooler.FanSize,
+                        CPUSocketCompatibility = airCooler.CPUSocketCompatibility,
+                        HeatsinkDimensions = airCooler.HeatsinkDimensions,
+                        Image = imgArray,
+                        ImgUrl = airCooler.ImgUrl,
+                        MaxCPUCoolerHeight = airCooler.MaxCPUCoolerHeight,
+                        Name = airCooler.Name,
+                        PowerConnector = airCooler.PowerConnector,
+                        RPM = airCooler.RPM,
+                        Weight = airCooler.Weight,
+                    };
+                    airCoolersToAdd.Add(airCoolerToAdd);
+                }
+                context.AirCoolers.AddRange(airCoolersToAdd);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApplicationDbContext())
+            {
+                var cases = context.Cases.Where(x => x.Name != " ").ToList();
+                context.Cases.RemoveRange(context.Cases);
+                context.SaveChanges();
+                var casesToAdd = new List<Case>();
+                Console.WriteLine(cases.Count);
+
+                foreach (var @case in cases)
+                {
+                    Console.WriteLine(@case.Id);
+                    var imgArray = TransformImage(@case.ImgUrl).GetAwaiter().GetResult();
+                    var caseToAdd = new Case
+                    {
+                        Brand = @case.Brand,
+                        MaxCPUCoolerHeightAllowance = @case.MaxCPUCoolerHeightAllowance,
+                        MaxGPULengthAllowance = @case.MaxGPULengthAllowance,
+                        CaseMaterial = @case.CaseMaterial,
+                        Color = @case.Color,
+                        ExpansionSlots = @case.ExpansionSlots,
+                        Image = imgArray,
+                        ImgUrl = @case.ImgUrl,
+                        MotherboardCompatibility = @case.MotherboardCompatibility,
+                        Name = @case.Name,
+                        SidePanelWindow = @case.SidePanelWindow,
+                        Type = @case.Type,
+                    };
+                    casesToAdd.Add(caseToAdd);
+                    @case.Image = imgArray;
+                }
+                context.Cases.AddRange(casesToAdd);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApplicationDbContext())
+            {
+                var hdds = context.HardDiskDrives.Where(x => x.Name != " ").ToList();
+                context.HardDiskDrives.RemoveRange(context.HardDiskDrives);
+                context.SaveChanges();
+                var hardDisksToAdd = new List<HardDiskDrive>();
+                Console.WriteLine(hdds.Count);
+
+                foreach (var hdd in hdds)
+                {
+                    Console.WriteLine(hdd.Id);
+                    var imgArray = TransformImage(hdd.ImgUrl).GetAwaiter().GetResult();
+                    var hardToAdd = new HardDiskDrive
+                    {
+                        Brand = hdd.Brand,
+                        Cache = hdd.Cache,
+                        Capacity = hdd.Capacity,
+                        FormFactor = hdd.FormFactor,
+                        Image = imgArray,
+                        ImgUrl = hdd.ImgUrl,
+                        Interface = hdd.Interface,
+                        Name = hdd.Name,
+                        RPM = hdd.RPM,
+                        Usage = hdd.Usage,
+                    };
+                    hardDisksToAdd.Add(hardToAdd);
+                    hdd.Image = imgArray;
+                }
+                context.HardDiskDrives.AddRange(hardDisksToAdd);
+                context.SaveChanges();
+            }
         }
 
         private static async Task<byte[]> TransformImage(string imgUrl)
