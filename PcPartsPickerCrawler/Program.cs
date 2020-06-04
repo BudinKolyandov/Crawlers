@@ -1,21 +1,12 @@
-﻿using AngleSharp.Html.Parser;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using NewEggCrawler;
+﻿using NewEggCrawler;
 using NewEggCrawler.Data;
 using NewEggCrawler.Data.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NewEggPartsCrawler
