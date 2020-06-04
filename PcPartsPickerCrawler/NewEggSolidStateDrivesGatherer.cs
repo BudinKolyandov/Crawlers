@@ -94,6 +94,13 @@ namespace NewEggCrawler
                 Console.WriteLine(count);
                 count++;
                 var document = await parser.ParseDocumentAsync(htmlContent);
+                var manufacturerInfo = document.GetElementById("MfrContact");
+                string productUrl = string.Empty;
+                if (manufacturerInfo != null)
+                {
+                    productUrl = manufacturerInfo.GetElementsByTagName("a")[0].ToString();
+                }
+
                 var productSpecs = document.GetElementById("detailSpecContent");
                 string productSpecsInnerHtml = string.Empty;
                 if (productSpecs == null)
@@ -113,6 +120,7 @@ namespace NewEggCrawler
                 var videoCard = new SolidStateDrive
                 {
                     Name = productName,
+                    ProductUrl = productUrl,
                 };
 
                 var imgHtmlElemnts = document.GetElementsByName("gallery");

@@ -6,6 +6,8 @@
 
         public string Name { get; set; }
 
+        public string ProductUrl { get; set; }
+
         public string ImgUrl { get; set; }
 
         public byte[] Image { get; set; }

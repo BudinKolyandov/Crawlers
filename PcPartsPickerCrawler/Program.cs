@@ -24,31 +24,27 @@ namespace NewEggPartsCrawler
     {
         static void Main(string[] args)
         {
-            // IEnumerable<Cpu> cpuResult;
-            // IEnumerable<Memory> memoryResult;
-            // IEnumerable<Motherboard> motherboardResult;
-            // IEnumerable<VideoCard> videoCardResult;
-            // IEnumerable<Case> caseResult;
-            // IEnumerable<AirCooler> airCoolerResult;
-            // IEnumerable<WaterCooler> waterCoolerResult;
-            // IEnumerable<PSU> powerSuppliesResult;
-            // IEnumerable<HardDiskDrive> hardDrivesResult;
-            // IEnumerable<SolidStateDrive> solidStateDrivesResult;
+            IEnumerable<Cpu> cpuResult;
+            IEnumerable<Memory> memoryResult;
+            IEnumerable<Motherboard> motherboardResult;
+            IEnumerable<VideoCard> videoCardResult;
+            IEnumerable<Case> caseResult;
+            IEnumerable<AirCooler> airCoolerResult;
+            IEnumerable<WaterCooler> waterCoolerResult;
+            IEnumerable<PSU> powerSuppliesResult;
+            IEnumerable<HardDiskDrive> hardDrivesResult;
+            IEnumerable<SolidStateDrive> solidStateDrivesResult;
 
-            var memoryesResult = new NewEggMemoryGatherer().GatherMemoryData().GetAwaiter().GetResult();
+            GatherData(out cpuResult, out memoryResult, out motherboardResult, out videoCardResult, out caseResult, out airCoolerResult, out waterCoolerResult, out powerSuppliesResult, out hardDrivesResult, out solidStateDrivesResult);
 
-            using (var context = new ApplicationDbContext())
-            {
-                context.Memories.AddRange(memoryesResult);
-                context.SaveChanges();
-            }
+            SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
 
-            // GatherData(out cpuResult, out memoryResult, out motherboardResult, out videoCardResult, out caseResult, out airCoolerResult, out waterCoolerResult, out powerSuppliesResult, out hardDrivesResult, out solidStateDrivesResult);
+            AddImagesToThePartsCpuToHdd();
+            AddImagesToThePartsRest();
+        }
 
-            // SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
-
-            // AddImagesToThePartsCpuToHdd();
-
+        private static void AddImagesToThePartsRest()
+        {
             using (var context = new ApplicationDbContext())
             {
                 var memories = context.Memories.Where(x => x.Name != " ").ToList();
@@ -252,10 +248,6 @@ namespace NewEggPartsCrawler
                 context.WaterCoolers.AddRange(waterCoolersToAdd);
                 context.SaveChanges();
             }
-
-            // CreateAndFillExcelTable(cpuResult, memoryResult);
-
-            // Console.WriteLine(cpuResult.Count());
         }
 
         private static void AddImagesToThePartsCpuToHdd()
@@ -398,7 +390,6 @@ namespace NewEggPartsCrawler
             var img = new byte[5000];
 
             var fullUrl = @"https://" + imgUrl;
-            var localPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             using (var client = new HttpClient())
             {
@@ -454,112 +445,5 @@ namespace NewEggPartsCrawler
             hardDrivesResult = new NewEggHardDrivesGatherer().GatherHardDrivesData().GetAwaiter().GetResult();
             solidStateDrivesResult = new NewEggSolidStateDrivesGatherer().GatherSolidStateDrivesData().GetAwaiter().GetResult();
         }
-
-        private static void CreateAndFillExcelTable(IEnumerable<Cpu> cpuResult, IEnumerable<Memory> memoryResult)
-        {
-            using (var spreadsheetDocument = SpreadsheetDocument.Create(@"E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls", SpreadsheetDocumentType.Workbook))
-            {
-                WorkbookPart workbookPart;
-                WorksheetPart worksheetPart;
-                SheetData sheetData;
-                Sheets sheets;
-
-                CreateTable(spreadsheetDocument, out workbookPart, out worksheetPart, out sheetData, out sheets);
-
-                DataTable procesorsTable = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(cpuResult), (typeof(DataTable)));
-                AddProcessorsToTable(procesorsTable, spreadsheetDocument, worksheetPart, sheetData, sheets);
-
-                DataTable memoriesTable = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(memoryResult), (typeof(DataTable)));
-                AddMemoriesToTable(memoriesTable, spreadsheetDocument, worksheetPart, sheetData, sheets);
-
-                workbookPart.Workbook.Save();
-
-                spreadsheetDocument.Close();
-
-                Console.WriteLine($@"Excel file created , you can find the file E:\DesktopOld\Desktop\Crawlers\ArdesCrawler\PcPartsPickerCrawler\Data\NewEggData.xls");
-            }
-        }
-
-        private static void AddMemoriesToTable(DataTable memoriesTable, SpreadsheetDocument spreadsheetDocument, WorksheetPart worksheetPart, SheetData sheetData, Sheets sheets)
-        {
-            Sheet memoriesSheet = new Sheet()
-            {
-                Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart) + 1,
-                SheetId = 2,
-                Name = "Memories"
-            };
-            sheets.Append(memoriesSheet);
-
-            Row headerRow = new Row();
-            var columns = new List<string>();
-            foreach (DataColumn column in memoriesTable.Columns)
-            {
-                columns.Add(column.ColumnName);
-                Cell cell = new Cell();
-                cell.DataType = CellValues.String;
-                cell.CellValue = new CellValue(column.ColumnName);
-                headerRow.AppendChild(cell);
-            }
-            sheetData.AppendChild(headerRow);
-            foreach (DataRow dsrow in memoriesTable.Rows)
-            {
-                Row newRow = new Row();
-                foreach (var col in columns)
-                {
-                    Cell cell = new Cell();
-                    cell.DataType = CellValues.String;
-                    cell.CellValue = new CellValue(dsrow[col].ToString());
-                    newRow.AppendChild(cell);
-                }
-                sheetData.AppendChild(newRow);
-            }
-        }
-
-        private static void AddProcessorsToTable(DataTable procesorsTable, SpreadsheetDocument spreadsheetDocument, WorksheetPart worksheetPart, SheetData sheetData, Sheets sheets)
-        {
-            Sheet processorsSheet = new Sheet()
-            {
-                Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
-                SheetId = 1,
-                Name = "Processors"
-            };
-            sheets.Append(processorsSheet);
-
-            Row headerRow = new Row();
-            var columns = new List<string>();
-            foreach (DataColumn column in procesorsTable.Columns)
-            {
-                columns.Add(column.ColumnName);
-                Cell cell = new Cell();
-                cell.DataType = CellValues.String;
-                cell.CellValue = new CellValue(column.ColumnName);
-                headerRow.AppendChild(cell);
-            }
-            sheetData.AppendChild(headerRow);
-            foreach (DataRow dsrow in procesorsTable.Rows)
-            {
-                Row newRow = new Row();
-                foreach (var col in columns)
-                {
-                    Cell cell = new Cell();
-                    cell.DataType = CellValues.String;
-                    cell.CellValue = new CellValue(dsrow[col].ToString());
-                    newRow.AppendChild(cell);
-                }
-                sheetData.AppendChild(newRow);
-            }
-        }
-
-        private static void CreateTable(SpreadsheetDocument spreadsheetDocument, out WorkbookPart workbookPart, out WorksheetPart worksheetPart, out SheetData sheetData, out Sheets sheets)
-        {
-            workbookPart = spreadsheetDocument.AddWorkbookPart();
-            workbookPart.Workbook = new Workbook();
-
-            worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-            sheetData = new SheetData();
-            worksheetPart.Worksheet = new Worksheet(sheetData);
-
-            sheets = workbookPart.Workbook.AppendChild(new Sheets());
-        }
-    }
+     }
 }
