@@ -39,7 +39,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var memories = context.Memories.Where(x => x.Name != " ").ToList();
-                context.Memories.RemoveRange(context.Memories);
                 context.SaveChanges();
                 var memoriesToAdd = new List<Memory>();
                 Console.WriteLine(memories.Count);
@@ -66,6 +65,7 @@ namespace NewEggPartsCrawler
                     memoriesToAdd.Add(memoryToAdd);
                     memory.Image = imgArray;
                 }
+                context.Memories.RemoveRange(context.Memories);
                 context.Memories.AddRange(memoriesToAdd);
                 context.SaveChanges();
             }
@@ -73,7 +73,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var motherboards = context.Motherboards.Where(x => x.Name != " ").ToList();
-                context.Motherboards.RemoveRange(context.Motherboards);
                 context.SaveChanges();
                 var motherboardsToAdd = new List<Motherboard>();
                 Console.WriteLine(motherboards.Count);
@@ -102,6 +101,7 @@ namespace NewEggPartsCrawler
                     motherboardsToAdd.Add(motherboardToAdd);
                     motherboard.Image = imgArray;
                 }
+                context.Motherboards.RemoveRange(context.Motherboards);
                 context.Motherboards.AddRange(motherboardsToAdd);
                 context.SaveChanges();
             }
@@ -109,7 +109,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var psus = context.PSUs.Where(x => x.Name != " ").ToList();
-                context.PSUs.RemoveRange(context.PSUs);
                 context.SaveChanges();
                 var psusToAdd = new List<PSU>();
                 Console.WriteLine(psus.Count);
@@ -133,6 +132,7 @@ namespace NewEggPartsCrawler
                     psusToAdd.Add(psuToAdd);
                     psu.Image = imgArray;
                 }
+                context.PSUs.RemoveRange(context.PSUs);
                 context.PSUs.AddRange(psusToAdd);
                 context.SaveChanges();
             }
@@ -140,7 +140,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var ssds = context.SolidStateDrives.Where(x => x.Name != " ").ToList();
-                context.SolidStateDrives.RemoveRange(context.SolidStateDrives);
                 context.SaveChanges();
                 var ssdsToAdd = new List<SolidStateDrive>();
                 Console.WriteLine(ssds.Count);
@@ -165,6 +164,7 @@ namespace NewEggPartsCrawler
                     ssdsToAdd.Add(ssdToAdd);
                     ssd.Image = imgArray;
                 }
+                context.SolidStateDrives.RemoveRange(context.SolidStateDrives);
                 context.SolidStateDrives.AddRange(ssdsToAdd);
                 context.SaveChanges();
             }
@@ -172,7 +172,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var videoCards = context.VideoCards.Where(x => x.Name != " ").ToList();
-                context.VideoCards.RemoveRange(context.VideoCards);
                 context.SaveChanges();
                 var videoCardsToAdd = new List<VideoCard>();
                 Console.WriteLine(videoCards.Count);
@@ -202,6 +201,7 @@ namespace NewEggPartsCrawler
                     videoCardsToAdd.Add(videoCordToAdd);
                     videoCard.Image = imgArray;
                 }
+                context.VideoCards.RemoveRange(context.VideoCards);
                 context.VideoCards.AddRange(videoCardsToAdd);
                 context.SaveChanges();
             }
@@ -209,7 +209,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var waterCoolers = context.WaterCoolers.Where(x => x.Name != " ").ToList();
-                context.WaterCoolers.RemoveRange(context.WaterCoolers);
                 context.SaveChanges();
                 var waterCoolersToAdd = new List<WaterCooler>();
                 Console.WriteLine(waterCoolers.Count);
@@ -236,6 +235,7 @@ namespace NewEggPartsCrawler
                     waterCoolersToAdd.Add(waterCoolerToAdd);
                     waterCooler.Image = imgArray;
                 }
+                context.WaterCoolers.RemoveRange(context.WaterCoolers);
                 context.WaterCoolers.AddRange(waterCoolersToAdd);
                 context.SaveChanges();
             }
@@ -247,7 +247,6 @@ namespace NewEggPartsCrawler
             {
                 var cpus = context.Cpus
                     .Where(x => x.Name != " ").ToList();
-                context.Cpus.RemoveRange(context.Cpus);
                 context.SaveChanges();
                 var cpusToAdd = new List<Cpu>();
                 Console.WriteLine(cpus.Count);
@@ -273,6 +272,7 @@ namespace NewEggPartsCrawler
                     };
                     cpusToAdd.Add(cpuToAdd);
                 }
+                context.Cpus.RemoveRange(context.Cpus);
                 context.Cpus.AddRange(cpusToAdd);
                 context.SaveChanges();
             }
@@ -280,7 +280,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var airCoolers = context.AirCoolers.Where(x => x.Name != " ").ToList();
-                context.AirCoolers.RemoveRange(context.AirCoolers);
                 context.SaveChanges();
                 var airCoolersToAdd = new List<AirCooler>();
                 Console.WriteLine(airCoolers.Count);
@@ -305,6 +304,7 @@ namespace NewEggPartsCrawler
                     };
                     airCoolersToAdd.Add(airCoolerToAdd);
                 }
+                context.AirCoolers.RemoveRange(context.AirCoolers);
                 context.AirCoolers.AddRange(airCoolersToAdd);
                 context.SaveChanges();
             }
@@ -312,7 +312,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var cases = context.Cases.Where(x => x.Name != " ").ToList();
-                context.Cases.RemoveRange(context.Cases);
                 context.SaveChanges();
                 var casesToAdd = new List<Case>();
                 Console.WriteLine(cases.Count);
@@ -339,6 +338,7 @@ namespace NewEggPartsCrawler
                     casesToAdd.Add(caseToAdd);
                     @case.Image = imgArray;
                 }
+                context.Cases.RemoveRange(context.Cases);
                 context.Cases.AddRange(casesToAdd);
                 context.SaveChanges();
             }
@@ -346,7 +346,6 @@ namespace NewEggPartsCrawler
             using (var context = new ApplicationDbContext())
             {
                 var hdds = context.HardDiskDrives.Where(x => x.Name != " ").ToList();
-                context.HardDiskDrives.RemoveRange(context.HardDiskDrives);
                 context.SaveChanges();
                 var hardDisksToAdd = new List<HardDiskDrive>();
                 Console.WriteLine(hdds.Count);
@@ -371,6 +370,7 @@ namespace NewEggPartsCrawler
                     hardDisksToAdd.Add(hardToAdd);
                     hdd.Image = imgArray;
                 }
+                context.HardDiskDrives.RemoveRange(context.HardDiskDrives);
                 context.HardDiskDrives.AddRange(hardDisksToAdd);
                 context.SaveChanges();
             }
