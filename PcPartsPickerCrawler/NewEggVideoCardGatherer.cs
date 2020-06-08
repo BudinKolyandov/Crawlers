@@ -96,7 +96,7 @@ namespace NewEggCrawler
                 string productUrl = string.Empty;
                 if (manufacturerInfo != null)
                 {
-                    productUrl = manufacturerInfo.GetElementsByTagName("a")[0].ToString();
+                    productUrl = manufacturerInfo.GetElementsByTagName("a")[0].InnerHtml;
                 }
 
                 var productSpecs = document.GetElementById("detailSpecContent");

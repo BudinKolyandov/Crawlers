@@ -30,8 +30,8 @@ namespace NewEggPartsCrawler
 
             SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
 
-            AddImagesToThePartsCpuToHdd();
-            AddImagesToThePartsRest();
+            // AddImagesToThePartsCpuToHdd();
+            // AddImagesToThePartsRest();
         }
 
         private static void AddImagesToThePartsRest()
@@ -61,6 +61,7 @@ namespace NewEggPartsCrawler
                         Speed = memory.Speed,
                         Timing = memory.Timing,
                         Type = memory.Type,
+                        ProductUrl = memory.ProductUrl,
                     };
                     memoriesToAdd.Add(memoryToAdd);
                     memory.Image = imgArray;
@@ -97,6 +98,7 @@ namespace NewEggPartsCrawler
                         Model = motherboard.Model,
                         Name = motherboard.Name,
                         NumberOfMemorySlots = motherboard.NumberOfMemorySlots,
+                        ProductUrl = motherboard.ProductUrl,
                     };
                     motherboardsToAdd.Add(motherboardToAdd);
                     motherboard.Image = imgArray;
@@ -128,6 +130,7 @@ namespace NewEggPartsCrawler
                         Modular = psu.Modular,
                         Name = psu.Name,
                         Type = psu.Type,
+                        ProductUrl = psu.ProductUrl,
                     };
                     psusToAdd.Add(psuToAdd);
                     psu.Image = imgArray;
@@ -160,6 +163,7 @@ namespace NewEggPartsCrawler
                         MemoryComponents = ssd.MemoryComponents,
                         Name = ssd.Name,
                         UsedFor = ssd.UsedFor,
+                        ProductUrl = ssd.ProductUrl,
                     };
                     ssdsToAdd.Add(ssdToAdd);
                     ssd.Image = imgArray;
@@ -197,6 +201,7 @@ namespace NewEggPartsCrawler
                         SlotWidth = videoCard.SlotWidth,
                         StreamProcessors = videoCard.StreamProcessors,
                         SystemRequirements = videoCard.SystemRequirements,
+                        ProductUrl = videoCard.ProductUrl,
                     };
                     videoCardsToAdd.Add(videoCordToAdd);
                     videoCard.Image = imgArray;
@@ -231,6 +236,7 @@ namespace NewEggPartsCrawler
                         RadiatorDim = waterCooler.RadiatorDim,
                         TubeDim = waterCooler.TubeDim,
                         Type = waterCooler.Type,
+                        ProductUrl = waterCooler.ProductUrl,
                     };
                     waterCoolersToAdd.Add(waterCoolerToAdd);
                     waterCooler.Image = imgArray;
@@ -269,6 +275,7 @@ namespace NewEggPartsCrawler
                         ProcesorType = cpu.ProcesorType,
                         TDP = cpu.TDP,
                         Series = cpu.Series,
+                        ProductUrl = cpu.ProductUrl,
                     };
                     cpusToAdd.Add(cpuToAdd);
                 }
@@ -301,6 +308,7 @@ namespace NewEggPartsCrawler
                         PowerConnector = airCooler.PowerConnector,
                         RPM = airCooler.RPM,
                         Weight = airCooler.Weight,
+                        ProductUrl = airCooler.ProductUrl,
                     };
                     airCoolersToAdd.Add(airCoolerToAdd);
                 }
@@ -334,6 +342,7 @@ namespace NewEggPartsCrawler
                         Name = @case.Name,
                         SidePanelWindow = @case.SidePanelWindow,
                         Type = @case.Type,
+                        ProductUrl = @case.ProductUrl,
                     };
                     casesToAdd.Add(caseToAdd);
                     @case.Image = imgArray;
@@ -366,6 +375,7 @@ namespace NewEggPartsCrawler
                         Name = hdd.Name,
                         RPM = hdd.RPM,
                         Usage = hdd.Usage,
+                        ProductUrl = hdd.ProductUrl,
                     };
                     hardDisksToAdd.Add(hardToAdd);
                     hdd.Image = imgArray;
