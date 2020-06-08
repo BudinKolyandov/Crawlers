@@ -27,11 +27,11 @@ namespace NewEggPartsCrawler
             IEnumerable<SolidStateDrive> solidStateDrivesResult;
 
             GatherData(out cpuResult, out memoryResult, out motherboardResult, out videoCardResult, out caseResult, out airCoolerResult, out waterCoolerResult, out powerSuppliesResult, out hardDrivesResult, out solidStateDrivesResult);
-
+            
             SaveData(cpuResult, memoryResult, motherboardResult, videoCardResult, caseResult, airCoolerResult, waterCoolerResult, powerSuppliesResult, hardDrivesResult, solidStateDrivesResult);
 
-            // AddImagesToThePartsCpuToHdd();
-            // AddImagesToThePartsRest();
+            AddImagesToThePartsCpuToHdd();
+            AddImagesToThePartsRest();
         }
 
         private static void AddImagesToThePartsRest()
